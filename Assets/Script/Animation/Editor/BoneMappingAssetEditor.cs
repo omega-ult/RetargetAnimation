@@ -30,32 +30,59 @@ public class BoneMappingAssetEditor : Editor
             rect.y += 2;
             rect.height = EditorGUIUtility.singleLineHeight;
             
-            // 计算每个属性的矩形区域
-            float widthPerField = rect.width / 4f - 5f;
+            // 获取所有需要的属性
+            var sourcePath = element.FindPropertyRelative("sourcePath");
+            var targetPath = element.FindPropertyRelative("targetPath");
+            var matchChildren = element.FindPropertyRelative("matchChildren");
+            var applyPosition = element.FindPropertyRelative("applyPosition");
+            var applyRotation = element.FindPropertyRelative("applyRotation");
+            var applyScale = element.FindPropertyRelative("applyScale");
             
-            Rect sourceRect = new Rect(rect.x, rect.y, widthPerField/2, rect.height);
-            Rect targetRect = new Rect(rect.x + widthPerField + 5f, rect.y, widthPerField, rect.height);
-            Rect matchRect = new Rect(rect.x + 2 * (widthPerField + 5f), rect.y, widthPerField, rect.height);
+            // 源骨骼 - 第一行
+            float labelWidth = 60f;
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, labelWidth, rect.height), "源骨骼");
+            sourcePath.stringValue = EditorGUI.TextField(
+                new Rect(rect.x + labelWidth, rect.y, rect.width - labelWidth, rect.height),
+                sourcePath.stringValue);
             
-            EditorGUI.PropertyField(sourceRect, element.FindPropertyRelative("sourcePath"), new GUIContent("源骨骼"));
-            EditorGUI.PropertyField(targetRect, element.FindPropertyRelative("targetPath"), new GUIContent("目标骨骼"));
-            EditorGUI.PropertyField(matchRect, element.FindPropertyRelative("matchChildren"), new GUIContent("匹配子骨骼"));
-            
-            // 在下一行绘制变换选项
+            // 目标骨骼 - 第二行
             rect.y += EditorGUIUtility.singleLineHeight + 2;
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, labelWidth, rect.height), "目标骨骼");
+            targetPath.stringValue = EditorGUI.TextField(
+                new Rect(rect.x + labelWidth, rect.y, rect.width - labelWidth, rect.height),
+                targetPath.stringValue);
             
-            Rect posRect = new Rect(rect.x, rect.y, widthPerField, rect.height);
-            Rect rotRect = new Rect(rect.x + widthPerField + 5f, rect.y, widthPerField, rect.height);
-            Rect scaleRect = new Rect(rect.x + 2 * (widthPerField + 5f), rect.y, widthPerField, rect.height);
+            // 匹配子骨骼 - 第三行
+            rect.y += EditorGUIUtility.singleLineHeight + 2;
+            matchChildren.boolValue = EditorGUI.Toggle(
+                new Rect(rect.x, rect.y, rect.width, rect.height),
+                "匹配子骨骼", matchChildren.boolValue);
             
-            EditorGUI.PropertyField(posRect, element.FindPropertyRelative("applyPosition"), new GUIContent("位置"));
-            EditorGUI.PropertyField(rotRect, element.FindPropertyRelative("applyRotation"), new GUIContent("旋转"));
-            EditorGUI.PropertyField(scaleRect, element.FindPropertyRelative("applyScale"), new GUIContent("缩放"));
+            rect.y += EditorGUIUtility.singleLineHeight + 2;
+
+            // 变换选项 - 第四行
+            float toggleWidth = rect.width / 8f;
+            var transformRect = new Rect(rect.x, rect.y, toggleWidth, rect.height);
+            
+            applyPosition.boolValue = EditorGUI.Toggle(
+                transformRect,
+                "位置", applyPosition.boolValue);
+                
+            transformRect.x += toggleWidth;
+            applyRotation.boolValue = EditorGUI.Toggle(
+                transformRect,
+                "旋转", applyRotation.boolValue);
+                
+            transformRect.x += toggleWidth;
+            applyScale.boolValue = EditorGUI.Toggle(
+                transformRect,
+                "缩放", applyScale.boolValue);
         };
         
         boneMappingsList.elementHeightCallback = (int index) =>
         {
-            return EditorGUIUtility.singleLineHeight * 2 + 6;
+            // 更新元素高度以适应四行内容
+            return EditorGUIUtility.singleLineHeight * 4 + 8;
         };
         
         boneMappingsList.onAddCallback = (ReorderableList list) =>

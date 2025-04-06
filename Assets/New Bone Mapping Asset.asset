@@ -17,5 +17,5 @@ MonoBehaviour:
     targetPath: mixamorig:Spine
     applyPosition: 1
     applyRotation: 1
-    applyScale: 0
-    matchChildren: 0
+    applyScale: 1
+    matchChildren: 1
